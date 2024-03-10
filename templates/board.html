@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        {%  if title %}
+            <title>{{ title }}</title>
+        {% else %}
+            <title>Untitled Survey</title>
+        {% endif %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <div class="bingo-board">
+            {# Loop through data, rendering each bingo board square #}
+            {% for square in data %}
+                {% if square.completed %}
+                    <div class="square completed" onclick="">
+                {% else %}
+                    <div class="square" onclick="openModal('{{ square.prompt }}')">
+                {% endif %}
+                        {{ square.prompt }}
+                    </div>
+            {% endfor %}
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2 id="modal-prompt" class="modal-prompt"></h2>
+                </div>
+                <form action="" method="post">
+                    <div class="modal-body">
+
+                            <input type="hidden" name="prompt_id" id="prompt_id" value="">
+                            <textarea class="response-textarea" name="response" id="response" placeholder="Your response"></textarea>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <input class="btn-submit" type="submit" value="Complete!">
+                    </div>
+                </form>
+            </div>
+
+
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </body>
+</html>

@@ -1,0 +1,151 @@
+* {
+    /* Default Font */
+    font-family: 'Roboto', sans-serif;
+}
+
+.bingo-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 10px;
+    /* Align the board Center on the page */
+    margin-top: 12%;
+    background-color: #e8e6e2;
+    padding: .25em;
+}
+
+.bingo-board .square {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #1d5f83;
+    border-radius: 5px;
+    padding: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.bingo-board .square:hover {
+    background-color: #4ea8d8;
+}
+
+.bingo-board .square.completed {
+    background-color: #4ea8d8;
+    cursor: not-allowed;
+}
+
+/** MODAL **/
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  -webkit-animation-name: fadeIn; /* Fade in the background */
+  -webkit-animation-duration: 0.4s;
+  animation-name: fadeIn;
+  animation-duration: 0.4s
+}
+
+/* Modal Content */
+.modal-content {
+  position: fixed;
+  bottom: 0;
+  background-color: #fefefe;
+  width: 100%;
+  -webkit-animation-name: slideIn;
+  -webkit-animation-duration: 0.4s;
+  animation-name: slideIn;
+  animation-duration: 0.4s
+}
+
+/* The Close Button */
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #4ea8d8;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: #65001c;
+  color: white;
+  height: 5em;
+}
+
+.modal-body {
+    padding: 2px 16px;
+    height: 8em;
+}
+
+.modal-footer {
+  padding: 2px 16px;
+  height: 5em;
+  background-color: #65001c;
+  color: white;
+}
+
+/* Add Animation */
+@-webkit-keyframes slideIn {
+  from {bottom: -300px; opacity: 0}
+  to {bottom: 0; opacity: 1}
+}
+
+@keyframes slideIn {
+  from {bottom: -300px; opacity: 0}
+  to {bottom: 0; opacity: 1}
+}
+
+@-webkit-keyframes fadeIn {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+
+.response-textarea {
+    width: 100%;
+    height: 9em;
+    font-size: .75em;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    resize: none;
+}
+
+.btn-submit {
+    background-color: #4ea8d8;
+    font-size: 1em;
+    color: white;
+    padding: 14px 20px;
+    /* center the button itself */
+    margin-top: 1em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
