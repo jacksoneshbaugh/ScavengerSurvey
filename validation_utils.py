@@ -14,13 +14,16 @@ def validate_email(email):
     return '@' in email and '.' in email
 
 
-def validate_password(password):
+def validate_password(password1, password2):
     """
-    Validates a password. Rules: at least 8 characters, at least one number, at least one special character.
-    :param password: The password to validate.
+    Validates a password. Rules: at least 8 characters, at least one number, at least one special character,
+    and the two passwords must match.
+    :param password1: The first password submission to validate.
+    :param password2: The second password submission to validate.
     :return: an array of booleans for each rule.
     """
-    length = len(password) >= 8
-    number = any(char.isdigit() for char in password)
-    special = any(char in '!@#$%^&*()-+' for char in password)
-    return [length, number, special]
+    length = len(password1) >= 8
+    number = any(char.isdigit() for char in password1)
+    special = any(char in '!@#$%^&*()-+' for char in password1)
+    match = password1 == password2
+    return [length, number, special, match]

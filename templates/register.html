@@ -1,0 +1,23 @@
+{% include 'header.html' %}
+<!-- User Registration Form -->
+<div class="form-box">
+    <h2 class="form-title">Register</h2>
+    <div class="form-container">
+        <form action="/register" method="post">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name">
+
+            <label for="email">Email</label>
+            <input type="text" name="email" id="email">
+
+            <label for="password1">Password</label>
+            <input type="password" name="password1" id="password1">
+
+            <label for="password2">Password (Again, to make sure you know it!)</label>
+            <input type="password" name="password2" id="password2">
+
+            <button class="btn" type="submit">Register</button>
+        </form>
+    </div>
+</div>
+{% include 'footer.html' %}

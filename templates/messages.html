@@ -1,0 +1,9 @@
+<div class="message-separator"></div>
+{% if messages %}
+    {# Separator to bump messages below navbar #}
+    {% for message in messages %}
+        <div class="message message-{{ message[0] }}">
+            {{ message[1] }}
+        </div>
+    {% endfor %}
+{% endif %}

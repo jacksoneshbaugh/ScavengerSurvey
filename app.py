@@ -20,7 +20,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 
 from validation_utils import validate_email, validate_password
-from models.user_model import User
+
 
 class Base(DeclarativeBase):
     """
@@ -35,18 +35,21 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv('SECRET_KEY')
 
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 db = SQLAlchemy(model_class=Base)
+db.init_app(app)
+
+# Import models after db is created
+from models.user_model import User
 
 with app.app_context():
     db.create_all()
 
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
-
-
 # Bingo Board consists of 5x5 grid of question objects (id and prompt and completed)
-bingo_board = [
+board = [
     {'id': 1, 'prompt': 'What is the capital of France?', 'completed': True},
     {'id': 2, 'prompt': 'What is the capital of Germany?', 'completed': False},
     {'id': 3, 'prompt': 'What is the capital of Italy?', 'completed': False},
@@ -88,7 +91,7 @@ def bingo_board():
 
     messages = get_flashed_messages(with_categories=True)
 
-    return render_template('board.html', title='Board', data=bingo_board, messages=messages)
+    return render_template('board.html', title='Board', data=board, messages=messages)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -148,14 +151,15 @@ def register():
 
     form = flask.request.form
 
-    if form['email'] and form['password']:
+    if form['email'] and form['password1'] and form['password2'] and form['name']:
         email = form['email']
         name = form['name']
-        password = form['password']
+        password1 = form['password1']
+        password2 = form['password2']
 
         # Validate email and password
         email_valid = validate_email(email)
-        password_valid = validate_password(password)
+        password_valid = validate_password(password1, password2)
 
         # Compile all error messages and redirect if any errors
 
@@ -171,6 +175,9 @@ def register():
         if not password_valid[2]:
             flash("Password must contain at least one special character.", "error")
 
+        if not password_valid[3]:
+            flash("Passwords do not match.", "error")
+
         if not email_valid or not password_valid[0] or not password_valid[1] or not password_valid[2]:
             return redirect(url_for('register'))
 
@@ -182,7 +189,7 @@ def register():
             flash("This email is already in use. Maybe you meant to login?", "error")
             return redirect(url_for('register'))
 
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
         user = User(name=name, email=email, password=hashed_password)
         db.session.add(user)
         db.session.commit()
