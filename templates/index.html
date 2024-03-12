@@ -1,3 +1,22 @@
 {% include 'header.html' %}
 
+<!-- Select a Bingo Board -->
+
+{% if not data %}
+    <div class="bingo-title">
+        <h2>No Surveys Found.</h2>
+        <h4>Check back soon!</h4>
+    </div>
+{% else %}
+    <h2 class="bingo-title">Select a Survey</h2>
+    <div class="bingo-board">
+        {# Loop through data, rendering each bingo board square #}
+        {% for survey in data %}
+            <div class="square" onclick="window.location.href='/board/{{ survey.id }}'">
+                {{ survey.name }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 {% include 'footer.html' %}

@@ -59,7 +59,8 @@ with app.app_context():
 
 # Routes
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
+@login_required
 def index():
     """
     Renders the index page, unless the user is logged in. Then it redirects to the board.
@@ -67,18 +68,49 @@ def index():
     :return: the rendered index page.
     """
 
-    if current_user.is_authenticated:
-        return redirect(url_for('bingo_board'))
-    return render_template('index.html', title='Home')
+    # get all active surveys.
+
+    surveys = db.session.execute(db.select(Survey).where(Survey.active == True)).all()
+
+    if not surveys:
+        return render_template('index.html', title='Choose a Survey', data=None)
+
+    board = []
+
+    for survey in surveys:
+        survey = survey[0]
+        board.append(survey)
+
+    if len(board) == 1:
+
+        bingo_board = []
+        for question in board[0].questions:
+            # Check if the user has responded to the question
+            response = (db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
+                                                                           SurveyResponse.question_id == question.id))
+                        .first())
+            if response:
+                response = response[0]
+
+            bingo_board.append({'id': question.id,
+                                'prompt': question.question,
+                                'response': response.response if response else ''
+                                })
+
+            print(bingo_board)
+
+        return render_template('board.html', title=board[0].name, data=bingo_board, escape_string=escape_string,
+                               id=board[0].id, one_survey_active=True)
+
+    return render_template('index.html', title='Choose a Survey', data=board)
 
 
-@app.route('/board', methods=['GET', 'POST'])
-@login_required
-def bingo_board():
+@app.route('/board/<int:id>', methods=['GET', 'POST'])
+def bingo_board(id):
     """
-    Renders a bingo board survey.
-
-    :return: the rendered bingo board.
+    Renders the bingo board for the given ID.
+    :param id: the ID to render the bingo board for.
+    :return: the rendered bingo board for the given ID.
     """
 
     if flask.request.method == 'POST':
@@ -88,7 +120,7 @@ def bingo_board():
         response = form['response']
 
         if not response or not question_id:
-            return redirect(url_for('bingo_board'))
+            return redirect(url_for('bingo_board', id=id))
 
         # save the response - if it exists, update it
 
@@ -99,7 +131,7 @@ def bingo_board():
             survey_response = survey_response[0]
             survey_response.response = response
             db.session.commit()
-            return redirect(url_for('bingo_board'))
+            return redirect(url_for('bingo_board', id=id))
 
         # The question hasn't been answered yet, so add a new response
 
@@ -108,9 +140,18 @@ def bingo_board():
         db.session.commit()
 
     # Get the survey from the database
-    survey = db.session.execute(db.select(Survey).where(Survey.active == True)).first()[0]
+    survey = db.session.execute(db.select(Survey).where(Survey.id == id)).first()
+
+    if not survey:
+        return redirect(url_for('bingo_board', id=id))
+
+    survey = survey[0]
+
+    if not survey.active:
+        return redirect(url_for('bingo_board', id=id))
 
     # Construct the board to send to the view
+
     board = []
     for question in survey.questions:
         # Check if the user has responded to the question
@@ -123,7 +164,9 @@ def bingo_board():
         board.append({'id': question.id, 'prompt': question.question,
                       'response': response.response if response else ''})
 
-    return render_template('board.html', title=survey.name, data=board, escape_string=escape_string)
+        return render_template('board.html', title=survey.name, data=board, escape_string=escape_string, id=id)
+
+    # The user is submitting a response
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -135,7 +178,7 @@ def login():
     """
 
     if current_user.is_authenticated:
-        return redirect(url_for('bingo_board'))
+        return redirect(url_for('index'))
 
     if flask.request.method == 'GET':
         return render_template('login.html', title='Login')
@@ -179,8 +222,8 @@ def register():
     :return: the rendered registration page or a redirect to the login page.
     """
 
-    # if current_user.is_authenticated:
-    #    return redirect(url_for('bingo_board'))
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
 
     if flask.request.method == 'GET':
         return render_template('register.html', title='Register')
