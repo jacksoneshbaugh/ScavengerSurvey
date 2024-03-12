@@ -10,7 +10,7 @@
   - [x] Update a survey
   - [x] Toggle a survey to be active or inactive
   - [ ] Delete a survey
-  - [ ] Update these surveys to allow the user to select from a list of surveys, not enter the survey name alone.
+  - [ ] Update these scripts to allow the user to select from a list of surveys, not enter the survey name alone.
 - [ ] Implement functionality to export all boards in some way (maybe through a separate Python script)
 - [ ] Beautify the UI
 - [ ] Find a host, get a domain, etc
