@@ -1,12 +1,12 @@
         {% include 'header.html' %}
-        <h2 class="bingo-title">Lafayette Bingo Survey</h2>
+        <h2 class="bingo-title">{{ title }}</h2>
         <div class="bingo-board">
             {# Loop through data, rendering each bingo board square #}
             {% for square in data %}
-                {% if square.completed %}
-                    <div class="square completed" onclick="">
+                {% if not square.response == '' %}
+                    <div class="square completed" onclick="openModalWithResponse('{{ escape_string(square.prompt) }}', {{ square.id }}, '{{ escape_string(square.response) }}')">
                 {% else %}
-                    <div class="square" onclick="openModal('{{ square.prompt }}')">
+                    <div class="square" onclick="openModal('{{ escape_string(square.prompt) }}', {{ square.id }})">
                 {% endif %}
                         {{ square.prompt }}
                     </div>
@@ -21,13 +21,10 @@
                     <span class="close" onclick="closeModal()">&times;</span>
                     <h2 id="modal-prompt" class="modal-prompt"></h2>
                 </div>
-                <form action="" method="post">
+                <form action="{{ url_for('bingo_board') }}" method="post">
                     <div class="modal-body">
-
                             <input type="hidden" name="prompt_id" id="prompt_id" value="">
                             <textarea class="response-textarea" name="response" id="response" placeholder="Your response"></textarea>
-
-
                     </div>
                     <div class="modal-footer">
                         <input class="btn-submit-response" type="submit" value="Complete!">

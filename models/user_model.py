@@ -26,6 +26,8 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(80), nullable=False)
     authenticated: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    responses = relationship('SurveyResponse', back_populates='user')
+
     def __repr__(self):
         return f'<User {self.email}>'
 

@@ -12,10 +12,27 @@
  * Opens the modal and sets the prompt to the given value.
  *
  * @param prompt the prompt to display in the modal
+ * @param promptId the id of the prompt to submit a response for
  */
-function openModal(prompt) {
+function openModal(prompt, promptId) {
     document.getElementById('modal-prompt').innerHTML = prompt;
-    document.getElementById('prompt_id').value = prompt;
+    document.getElementById('prompt_id').value = promptId;
+    document.getElementById('modal').style.display = 'block';
+}
+
+/**
+ * Opens the modal and sets the prompt to the given value. Also sets the
+ * response to the given value, because this function is called when the user
+ * has already submitted a response for the given prompt.
+ *
+ * @param prompt the prompt to display in the modal
+ * @param promptId the id of the prompt to submit a response for
+ * @param response the response to display in the modal
+ */
+function openModalWithResponse(prompt, promptId, response) {
+    document.getElementById('modal-prompt').innerHTML = prompt;
+    document.getElementById('prompt_id').value = promptId;
+    document.getElementById('response').value = response;
     document.getElementById('modal').style.display = 'block';
 }
 

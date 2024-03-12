@@ -2,9 +2,15 @@
 - [x] Implement the board UI
 - [x] Implement the database
 - [x] Implement user accounts to associate saved boards with
-- [ ] Implement submission features to save the board
-  - [ ] Model to save the board
-- [ ] Implement a way to load the board
+- [x] Implement submission features to save the board
+  - [x] Model to save the board
+- [x] Implement a way to load the board
+- [ ] Scripts
+  - [x] Create a survey
+  - [x] Update a survey
+  - [x] Toggle a survey to be active or inactive
+  - [ ] Delete a survey
+  - [ ] Update these surveys to allow the user to select from a list of surveys, not enter the survey name alone.
 - [ ] Implement functionality to export all boards in some way (maybe through a separate Python script)
 - [ ] Beautify the UI
 - [ ] Find a host, get a domain, etc

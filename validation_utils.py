@@ -27,3 +27,12 @@ def validate_password(password1, password2):
     special = any(char in '!@#$%^&*()-+' for char in password1)
     match = password1 == password2
     return [length, number, special, match]
+
+
+def escape_string(string):
+    """
+    Escapes a string.
+    :param string: The string to escape.
+    :return: The escaped string.
+    """
+    return string.replace("'", "\\'")
