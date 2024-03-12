@@ -1,0 +1,17 @@
+{% include 'header.html' %}
+<!-- User Login Form -->
+<div class="form-box">
+    <h2 class="form-title">Log In</h2>
+    <div class="form-container">
+        <form action="{{ url_for('login') }}" method="post">
+            <label for="email">Email</label>
+            <input type="text" name="email" id="email">
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+
+            <button class="btn" type="submit">Login</button>
+        </form>
+    </div>
+</div>
+{% include 'footer.html' %}

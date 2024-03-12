@@ -7,6 +7,7 @@ over some period of time.
 ___author___ = "Jackson Eshbaugh"
 ___version___ = "03/11/2024"
 
+import logging
 import os
 
 import bcrypt
@@ -33,10 +34,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.secret_key = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SESSION_COOKIE_SECURE'] = os.getenv('SESSION_COOKIE_SECURE').lower() == 'true'
+app.config['SESSION_COOKIE_HTTPONLY'] = os.getenv('SESSION_COOKIE_HTTPONLY').lower() == 'true'
+app.config['SESSION_COOKIE_SAMESITE'] = os.getenv('SESSION_COOKIE_SAMESITE')
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 db = SQLAlchemy(model_class=Base)
@@ -80,20 +85,6 @@ board = [
 
 # Routes
 
-@app.route('/board')
-# @login_required
-def bingo_board():
-    """
-    Renders the bingo board.
-
-    :return: the rendered bingo board.
-    """
-
-    messages = get_flashed_messages(with_categories=True)
-
-    return render_template('board.html', title='Board', data=board, messages=messages)
-
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """
@@ -102,11 +93,21 @@ def index():
     :return: the rendered index page.
     """
 
-    messages = get_flashed_messages(with_categories=True)
-
     if current_user.is_authenticated:
-        return redirect(url_for('board'))
-    return render_template('index.html', title='Home', messages=messages)
+        return redirect(url_for('bingo_board'))
+    return render_template('index.html', title='Home')
+
+
+@app.route('/board')
+@login_required
+def bingo_board():
+    """
+    Renders the bingo board.
+
+    :return: the rendered bingo board.
+    """
+
+    return render_template('board.html', title='Board', data=board)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -117,21 +118,42 @@ def login():
     :return: the rendered login page or a redirect to the board.
     """
 
-    messages = get_flashed_messages(with_categories=True)
+    if current_user.is_authenticated:
+        return redirect(url_for('bingo_board'))
 
     if flask.request.method == 'GET':
-        return render_template('login.html', title='Login', messages=messages)
+        return render_template('login.html', title='Login')
 
     form = flask.request.form
 
-    if form['email'] and form['password']:
-        email = form['email']
-        password = form['password']
+    if not form['email']:
+        flash("Email is required.", "error")
 
-        user = User.query.filter_by(email=email).first()
-        if user and bcrypt.checkpw(password.encode('utf-8'), user.password):
-            flask_login.login_user(user)
-            return redirect(url_for('board'))
+    if not form['password']:
+        flash("Password is required.", "error")
+
+    if not form['email'] or not form['password']:
+        return redirect(url_for('login'))
+
+    email = form['email']
+    password = form['password']
+
+    result = db.session.execute(db.select(User).where(User.email == email)).first()
+    user = result[0]
+
+    if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+
+        user.authenticated = True
+        db.session.commit()
+
+        if flask_login.login_user(user):
+            return redirect(url_for('bingo_board'))
+        else:
+            flash("Error authenticating", "error")
+            return redirect(url_for('login'))
+    else:
+        flash("Invalid email or password.", "error")
+        return redirect(url_for('login'))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -141,61 +163,78 @@ def register():
     :return: the rendered registration page or a redirect to the login page.
     """
 
-    messages = get_flashed_messages(with_categories=True)
-
-    if current_user.is_authenticated:
-        return redirect(url_for('board'))
+    # if current_user.is_authenticated:
+    #    return redirect(url_for('bingo_board'))
 
     if flask.request.method == 'GET':
-        return render_template('register.html', title='Register', messages=messages)
+        return render_template('register.html', title='Register')
 
     form = flask.request.form
 
-    if form['email'] and form['password1'] and form['password2'] and form['name']:
-        email = form['email']
-        name = form['name']
-        password1 = form['password1']
-        password2 = form['password2']
+    # Ensure all fields are filled out
+    if not form['email']:
+        flash("Email is required.", "error")
+        print("Email is required.")
 
-        # Validate email and password
-        email_valid = validate_email(email)
-        password_valid = validate_password(password1, password2)
+    if not form['password1']:
+        flash("Password is required.", "error")
+        print("Password is required.")
 
-        # Compile all error messages and redirect if any errors
+    if not form['password2']:
+        flash("Password confirmation is required.", "error")
+        print("Password confirmation is required.")
 
-        if not email_valid:
-            flash("Invalid email.", "error")
+    if not form['name']:
+        flash("Name is required.", "error")
+        print("Name is required.")
 
-        if not password_valid[0]:
-            flash("Password must be at least 8 characters.", "error")
+    if not form['email'] or not form['password1'] or not form['password2'] or not form['name']:
+        return redirect(url_for('register'))
 
-        if not password_valid[1]:
-            flash("Password must contain at least one number.", "error")
+    email = form['email']
+    name = form['name']
+    password1 = form['password1']
+    password2 = form['password2']
 
-        if not password_valid[2]:
-            flash("Password must contain at least one special character.", "error")
+    # Validate email and password
+    email_valid = validate_email(email)
+    password_valid = validate_password(password1, password2)
 
-        if not password_valid[3]:
-            flash("Passwords do not match.", "error")
+    # Compile all error messages and redirect if any errors
 
-        if not email_valid or not password_valid[0] or not password_valid[1] or not password_valid[2]:
-            return redirect(url_for('register'))
+    if not email_valid:
+        flash("Invalid email.", "error")
 
-        # We have valid entries at this point.
-        # Next, check to see if the email is already in use.
+    if not password_valid[0]:
+        flash("Password must be at least 8 characters.", "error")
 
-        user = User.query.filter_by(email=email).first()
-        if user:
-            flash("This email is already in use. Maybe you meant to login?", "error")
-            return redirect(url_for('register'))
+    if not password_valid[1]:
+        flash("Password must contain at least one number.", "error")
 
-        hashed_password = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
-        user = User(name=name, email=email, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
+    if not password_valid[2]:
+        flash("Password must contain at least one special character.", "error")
 
-        flash("Successfully registered! Please login.", "success")
-        return redirect(url_for('login'))
+    if not password_valid[3]:
+        flash("Passwords do not match.", "error")
+
+    if not email_valid or not password_valid[0] or not password_valid[1] or not password_valid[2] or not password_valid[3]:
+        return redirect(url_for('register'))
+
+    # We have valid entries at this point.
+    # Next, check to see if the email is already in use.
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        flash("This email is already in use. Maybe you meant to login?", "error")
+        return redirect(url_for('register'))
+
+    hashed_password = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
+    user = User(name=name, email=email, password=hashed_password)
+    db.session.add(user)
+    db.session.commit()
+
+    flash("Successfully registered! Please login.", "success")
+    return redirect(url_for('login'))
 
 
 @app.route('/logout')
@@ -206,6 +245,9 @@ def logout():
     :return: a redirect to the index page.
     """
 
+    user = current_user
+    user.authenticated = False
+    db.session.commit()
     flask_login.logout_user()
     return redirect(url_for('index'))
 

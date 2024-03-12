@@ -1,9 +1,10 @@
 <div class="message-separator"></div>
-{% if messages %}
-    {# Separator to bump messages below navbar #}
-    {% for message in messages %}
-        <div class="message message-{{ message[0] }}">
-            {{ message[1] }}
-        </div>
-    {% endfor %}
-{% endif %}
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="message message-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}

@@ -188,11 +188,11 @@ body {
     padding: 14px 16px;
     text-decoration: none;
     font-size: 17px;
+    margin: 0;
 }
 
 .navbar a:hover {
-    background: #ddd;
-    color: black;
+    color: #4ea8d8;
 }
 
 .navbar a.active {
@@ -206,6 +206,15 @@ body {
 
 .navbar .navbar-right {
     float: right;
+}
+
+.user-name {
+    float: left;
+    padding: 14px 16px;
+    color: #f2f2f2;
+    text-align: center;
+    text-decoration: none;
+    font-size: 17px;
 }
 
 @media screen and (max-width: 600px) {
@@ -290,10 +299,9 @@ body {
 .message {
     text-align: center;
     padding: 10px;
-    background-color: #4ea8d8;
-    color: white;
-    margin-top: 2em;
-    margin-bottom: 1em;
+    max-width: 25em;
+    margin: 2em auto 1em;
+    border-radius: 10px;
 }
 
 .message-error {
@@ -362,6 +370,10 @@ body {
     padding: 1em;
 }
 
+.footer-spacer {
+    height: 5em;
+}
+
 /* Responsive Footer */
 
 @media screen and (max-width: 600px) {
@@ -398,7 +410,7 @@ body {
 
 .form-container input[type=text]:focus, .form-container input[type=password]:focus {
     background-color: #ddd;
-    outline: none;
+    outline: 3px solid #4ea8d8;
 }
 
 .form-container .btn {
@@ -427,7 +439,6 @@ body {
 }
 
 .form-box {
-    /* center the form */
     margin: 5em auto auto;
     max-width: 25em;
     padding: 20px;
@@ -463,7 +474,7 @@ body {
 
     .form-container input[type=text]:focus, .form-container input[type=password]:focus {
         background-color: #ddd;
-        outline: none;
+        outline: 3px solid #4ea8d8;
     }
 
     .form-container .btn {
@@ -492,7 +503,6 @@ body {
     }
 
     .form-box {
-        /* center the form */
         margin: 5em auto auto;
         max-width: 25em;
         padding: 20px;
