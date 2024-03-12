@@ -5,13 +5,13 @@
  *
  * @file modal.js
  * @author Jackson Eshbaugh
- * @version 03/10/2024
+ * @version 03/11/2024
  */
 
 /**
  * Opens the modal and sets the prompt to the given value.
  *
- * @param prompt
+ * @param prompt the prompt to display in the modal
  */
 function openModal(prompt) {
     document.getElementById('modal-prompt').innerHTML = prompt;
@@ -28,18 +28,10 @@ function closeModal() {
 }
 
 /**
- * Submits the response to the server, unless the response is empty.
- * Also closes the modal and updates the bingo board.
- */
-function submitResponse() {
-    // May need to save ID of the prompt to identify which bingo square to update.
-}
-
-/**
  * Listens for the user to click anywhere outside the modal and closes the
  * modal if so.
  *
- * @param event
+ * @param event the event that triggered the listener
  */
 window.onclick = function(event) {
     if (event.target === document.getElementById('modal')) {

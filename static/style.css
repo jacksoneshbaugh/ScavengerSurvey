@@ -108,7 +108,7 @@ body {
 
 .modal-body {
     padding: 2px 16px;
-    height: 8em;
+    height: 10em;
 }
 
 .modal-footer {
@@ -139,12 +139,12 @@ body {
   to {opacity: 1}
 }
 
-/* Form */
+/* Modal Form */
 
 .response-textarea {
     width: 100%;
     height: 9em;
-    font-size: .75em;
+    font-size: 1em;
     padding: 12px 20px;
     margin: 8px 0;
     box-sizing: border-box;
@@ -154,12 +154,11 @@ body {
     resize: none;
 }
 
-.btn-submit {
+.btn-submit-response {
     background-color: #4ea8d8;
     font-size: 1em;
     color: white;
     padding: 14px 20px;
-    /* center the button itself */
     margin-top: 1em;
     border: none;
     border-radius: 4px;
@@ -406,6 +405,7 @@ body {
     border: none;
     background: #f1f1f1;
     border-radius: 10px;
+    font-size: 1em;
 }
 
 .form-container input[type=text]:focus, .form-container input[type=password]:focus {

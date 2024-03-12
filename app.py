@@ -139,7 +139,7 @@ def login():
     password = form['password']
 
     result = db.session.execute(db.select(User).where(User.email == email)).first()
-    user = result[0]
+    user = result[0] if result else None
 
     if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
 
@@ -152,7 +152,7 @@ def login():
             flash("Error authenticating", "error")
             return redirect(url_for('login'))
     else:
-        flash("Invalid email or password.", "error")
+        flash("Invalid email and password combination.", "error")
         return redirect(url_for('login'))
 
 
