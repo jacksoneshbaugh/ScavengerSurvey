@@ -1,3 +1,7 @@
+"""
+This file is the entry point for the application. It creates the Flask app and sets up the database and login manager.
+"""
+
 import os
 
 from dotenv import load_dotenv
