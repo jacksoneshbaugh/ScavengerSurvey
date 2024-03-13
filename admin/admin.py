@@ -5,12 +5,15 @@ Allows the user to create, update, toggle and delete surveys.
 
 import sys
 import os
+from datetime import datetime
+import csv
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app import app, db
 from models.survey_model import Survey
 from models.survey_question_model import SurveyQuestion
+from models.survey_response_model import SurveyResponse
 
 __author__ = "Jackson Eshbaugh"
 __version__ = "03/12/2024"
@@ -286,6 +289,56 @@ def delete_survey():
     print(Colors.OKGREEN + f'Survey {survey.name} deleted.' + Colors.ENDC)
 
 
+def export_results():
+    """
+    Export the results of a survey to a CSV file. Only inactive surveys can have their data exported.
+    """
+
+    print('OK, let\'s export the results of a survey.')
+    print('Firstly, we need to select a survey.')
+
+    survey = select_survey('export')
+
+    if not survey:
+        # User chose to return to the main menu
+        return
+
+    if survey.active:
+        print(Colors.FAIL + f'Survey {survey.name} is active and cannot have its results exported. Deactivate it to '
+                            f'export its results.' + Colors.ENDC)
+        return
+
+    print(Colors.OKGREEN + f'Exporting results for survey {survey.name}.' + Colors.ENDC)
+
+    questions = db.session.execute(db.select(SurveyQuestion).where(SurveyQuestion.survey_id == survey.id)).all()
+
+    if not questions:
+        print(Colors.WARNING + 'No questions found for this survey. Start by adding some questions.' + Colors.ENDC)
+        return
+
+    if not os.path.exists(f'results/{survey.name}'):
+        os.makedirs(f'results/{survey.name}')
+
+    with open(f'results/{survey.name}/{survey.name}_results_{datetime.now()}.csv', 'w') as file:
+        writer = csv.writer(file)
+
+        # Header
+        writer.writerow(['User ID', 'Question ID', 'Question', 'Response'])
+
+        for question in questions:
+            question = question[0]
+
+            # find all responses for this question
+            responses = db.session.execute(db.select(SurveyResponse).where(SurveyResponse.question_id == question.id)).all()
+
+            for response in responses:
+                response = response[0]
+                writer.writerow([response.user_id, response.question_id, question.question, response.response])
+
+    print(Colors.OKGREEN + f'Results exported to results/{survey.name}/{survey.name}_results_{datetime.now()}.csv'
+          + Colors.ENDC)
+
+
 with app.app_context():
     print('           ADMIN CONSOLE')
     print(Colors.HEADER + '+----------------------------------+' + Colors.ENDC)
@@ -302,7 +355,8 @@ with app.app_context():
         print(Colors.HEADER + '| 3. [T]oggle a survey\'s status  |' + Colors.ENDC)
         print(Colors.HEADER + '| 4. [D]elete a survey           |' + Colors.ENDC)
         print(Colors.HEADER + '| 5. [L]ist all surveys          |' + Colors.ENDC)
-        print(Colors.HEADER + '| 6. [Q]uit                      |' + Colors.ENDC)
+        print(Colors.HEADER + '| 6. [E]xport results            |' + Colors.ENDC)
+        print(Colors.HEADER + '| 7. [Q]uit                      |' + Colors.ENDC)
         print(Colors.HEADER + '+--------------------------------+' + Colors.ENDC)
 
         choice = input('Enter a choice: ').lower()
@@ -317,7 +371,9 @@ with app.app_context():
             delete_survey()
         elif choice == 'l' or choice == '5':
             list_surveys()
-        elif choice == 'q' or choice == '6':
+        elif choice == 'e' or choice == '6':
+            export_results()
+        elif choice == 'q' or choice == '7':
             print('Goodbye!')
             break
         else:

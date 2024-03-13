@@ -5,15 +5,14 @@
 - [x] Implement submission features to save the board
   - [x] Model to save the board
 - [x] Implement a way to load the board
-- [ ] Scripts
+- [x] Scripts
   - [x] Create a survey
   - [x] Update a survey
   - [x] Toggle a survey to be active or inactive
   - [x] Delete a survey
   - [x] Update these scripts to allow the user to select from a list of surveys, not enter the survey name alone.
-  - [ ] Implement functionality to export board results.
+  - [x] Implement functionality to export board results.
 - [x] Implement the possibility to have multiple boards active at one time
   - This will involve implementing a board chooser if and only if there are multiple boards active
 - [x] Beautify the CSS code
 - [ ] Beautify the UI
-- [ ] Find a host, get a domain, etc
