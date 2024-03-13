@@ -35,4 +35,4 @@ def escape_string(string):
     :param string: The string to escape.
     :return: The escaped string.
     """
-    return string.replace("'", "\\'")
+    return string.replace("'", "\\'").replace('"', '\\"')

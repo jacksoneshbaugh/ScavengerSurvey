@@ -14,5 +14,6 @@
   - [ ] Implement functionality to export board results.
 - [x] Implement the possibility to have multiple boards active at one time
   - This will involve implementing a board chooser if and only if there are multiple boards active
+- [x] Beautify the CSS code
 - [ ] Beautify the UI
 - [ ] Find a host, get a domain, etc
