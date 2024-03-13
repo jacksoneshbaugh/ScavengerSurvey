@@ -16,6 +16,7 @@
   - This will involve implementing a board chooser if and only if there are multiple boards active
 - [x] Beautify the CSS code
 - [ ] Work on README.md and GitHub documentation.
+- [ ] Possibly create an install script?
 - [ ] Question Types
   - Currently, the only question type is a text input. It would be nice to have multiple question types, such as multiple choice, checkboxes, etc.
 - [ ] More robust export functionality

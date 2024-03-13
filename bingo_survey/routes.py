@@ -7,54 +7,22 @@ over some period of time.
 ___author___ = "Jackson Eshbaugh"
 ___version___ = "03/11/2024"
 
-import logging
 import os
 
 import bcrypt
 import flask
 import flask_login
-from flask import Flask, render_template, url_for, redirect, get_flashed_messages
+from flask import Flask, render_template, url_for, redirect
 from dotenv import load_dotenv
 from flask_login import login_required, current_user
 from flask import flash
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 
-from validation_utils import validate_email, validate_password, escape_string
-
-
-class Base(DeclarativeBase):
-    """
-    Base class for all models.
-    """
-    pass
-
-
-load_dotenv()
-
-app = Flask(__name__)
-
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SESSION_COOKIE_SECURE'] = os.getenv('SESSION_COOKIE_SECURE').lower() == 'true'
-app.config['SESSION_COOKIE_HTTPONLY'] = os.getenv('SESSION_COOKIE_HTTPONLY').lower() == 'true'
-app.config['SESSION_COOKIE_SAMESITE'] = os.getenv('SESSION_COOKIE_SAMESITE')
-
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
-db = SQLAlchemy(model_class=Base)
-db.init_app(app)
-
-# Import models after db is created
-from models.user_model import User
-from models.survey_model import Survey
-from models.survey_question_model import SurveyQuestion
-from models.survey_response_model import SurveyResponse
-
-with app.app_context():
-    db.create_all()
+from bingo_survey import app, db
+from bingo_survey.models import Survey, SurveyResponse, User
+from bingo_survey.validation_utils import validate_email, validate_password, escape_string
 
 
 # Routes

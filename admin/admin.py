@@ -10,10 +10,8 @@ import csv
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app, db
-from models.survey_model import Survey
-from models.survey_question_model import SurveyQuestion
-from models.survey_response_model import SurveyResponse
+from bingo_survey.models import Survey, SurveyQuestion, SurveyResponse
+from bingo_survey import app, db
 
 __author__ = "Jackson Eshbaugh"
 __version__ = "03/12/2024"
@@ -335,7 +333,7 @@ def export_results():
                 response = response[0]
                 writer.writerow([response.user_id, response.question_id, question.question, response.response])
 
-    print(Colors.OKGREEN + f'Results exported to results/{survey.name}/{survey.name}_results_{datetime.now()}.csv'
+    print(Colors.OKGREEN + f'Results exported to admin/results/{survey.name}/{survey.name}_results_{datetime.now()}.csv'
           + Colors.ENDC)
 
 

@@ -2,7 +2,7 @@
 Useful functions for validation of data in the app.
 """
 ___author___ = "Jackson Eshbaugh"
-___version___ = "03/11/2024"
+___version___ = "03/13/2024"
 
 
 def validate_email(email):
