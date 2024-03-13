@@ -15,4 +15,10 @@
 - [x] Implement the possibility to have multiple boards active at one time
   - This will involve implementing a board chooser if and only if there are multiple boards active
 - [x] Beautify the CSS code
-- [ ] Beautify the UI
+- [ ] Work on README.md and GitHub documentation.
+- [ ] Question Types
+  - Currently, the only question type is a text input. It would be nice to have multiple question types, such as multiple choice, checkboxes, etc.
+- [ ] More robust export functionality
+  - Currently, the export functionality is very basic. It would be nice to have a more robust export functionality, such as the ability to export only certain columns, or to export only certain rows, or even to export multiple surveys into one file. Also, the ability to export to other file types, such as plaintext or Excel excites me.
+- [ ] More robust user accounts
+  - Currently, the only thing you can do with a user account is to play a board. It would be nice to have more robust user accounts, such as the ability to create boards, or to view past results.
