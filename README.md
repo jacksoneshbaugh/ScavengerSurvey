@@ -41,7 +41,7 @@ print(secret_key)
 ```
 You can change the length of the secret key by changing the number in ``secrets.token_hex()``. Replace ``your_secret_key`` with the generated secret key.
 
-``DATABASE_URI`` is the URI to your database. The general format is ``mysql://username:password@address:port/database``. Replace ``username``, ``password``, ``address``, ``port``, and ``database`` with your database's information. If your database is different, you can change the URI to match your database's URI. Keep in mind that this app was developed using SQLAlchemy, so the URI should be compatible with SQLAlchemy.
+``DATABASE_URI`` is the URI to your database. The general format is ``mysql://username:password@address:port/database``. Replace ``username``, ``password``, ``address``, ``port``, and ``database`` with your database's information. If your database software is different, you can change the URI to match your database's URI. Keep in mind that this app was developed using SQLAlchemy, so the URI should be compatible with SQLAlchemy.
 
 ``SESSION_COOKIE_SECURE`` determines if the session cookie is secure. If you are using HTTPS, set this to ``True``. If you are using HTTP, set this to ``False``.
 
