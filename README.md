@@ -49,16 +49,16 @@ You can change the length of the secret key by changing the number in ``secrets.
 
 ``SESSION_COOKIE_SAMESITE`` determines the SameSite attribute of the session cookie. If you want to prevent the session cookie from being sent in a cross-site request, set this to ``"Strict"``. If you want the session cookie to be sent in a cross-site request, set this to ``"Lax"``. If you want the session cookie to be sent in a cross-site request and you want to prevent the session cookie from being sent in a cross-site request from a different site, set this to ``"None"``.
 
-5. Run the app using either ``start.sh`` or ``start.bat``:
+5. Run the app using either ``start_dev.sh`` or ``start_dev.bat``:
 
 For Linux and macOS:
 ```bash
-./start.sh
+./start_dev.sh
 ```
 
 For Windows:
 ```powershell
-start.bat
+start_dev.bat
 ```
 
 ### How to deploy BingoSurvey (in production mode)

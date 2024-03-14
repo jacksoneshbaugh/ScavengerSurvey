@@ -26,7 +26,7 @@ class Colors:
     ENDC = '\033[0m'
 
 
-def list_surveys():
+def list_surveys() -> None:
     """
     List all surveys, printing them out to the console.
     """
@@ -42,7 +42,7 @@ def list_surveys():
     print(Colors.HEADER + '+----------------------------------+\n' + Colors.ENDC)
 
 
-def list_questions(survey):
+def list_questions(survey: Survey) -> None:
     """
     Given a survey, print out all of its questions.
     :param survey: the survey to select a question from
@@ -63,7 +63,7 @@ def list_questions(survey):
         print(f'{question.id}: {question.question}')
 
 
-def select_survey(task_verb):
+def select_survey(task_verb: str) -> Survey | None:
     """
     Select a survey by ID.
     :param task_verb: the verb to use in the prompt
@@ -86,7 +86,7 @@ def select_survey(task_verb):
     return survey[0]
 
 
-def select_question(survey, action_verb):
+def select_question(survey: Survey, action_verb: str) -> SurveyQuestion | None:
     """
     Given a survey, select a question by ID.
     :param survey: the survey to select a question from
@@ -111,7 +111,7 @@ def select_question(survey, action_verb):
     return question
 
 
-def update_survey():
+def update_survey() -> None:
     """
     Update a survey and its questions.
     """
@@ -119,7 +119,7 @@ def update_survey():
     print('Let\'s update a survey.')
 
     # Select a survey
-    survey = select_survey('update')
+    survey: Survey = select_survey('update')
 
     if not survey:
         # User chose to return to the main menu
@@ -136,15 +136,15 @@ def update_survey():
         print(Colors.HEADER + '| 6. Return to [m]ain menu         |' + Colors.ENDC)
         print(Colors.HEADER + '+----------------------------------+' + Colors.ENDC)
 
-        choice = input('Enter a choice: ').lower()
+        choice: str = input('Enter a choice: ').lower()
 
         if choice == 'n' or choice == '1':
-            new_name = input(f'Enter a new name for {survey.name} (or press Enter to return to the update menu): ')
+            new_name: str = input(f'Enter a new name for {survey.name} (or press Enter to return to the update menu): ')
 
             if new_name == '':
                 continue
 
-            old_name = survey.name
+            old_name: str = survey.name
             survey.name = new_name
             db.session.commit()
             print(f'Survey name updated: "{old_name}" -> "{new_name}".')
@@ -152,11 +152,12 @@ def update_survey():
         elif choice == 'a' or choice == '2':
             # Add survey questions
             while True:
-                question_text = input('Enter a question for the survey (or press Enter to return to the update menu): ')
+                question_text: str = input('Enter a question for the survey (or press Enter to return to the update '
+                                           'menu): ')
                 if question_text == '':
                     break
 
-                question = SurveyQuestion(survey_id=survey.id, question=question_text)
+                question: SurveyQuestion = SurveyQuestion(survey_id=survey.id, question=question_text)
                 db.session.add(question)
                 db.session.commit()
 
@@ -167,13 +168,13 @@ def update_survey():
         elif choice == 'e' or choice == '4':
             # Edit a survey question
 
-            question = select_question(survey, 'edit')
+            question: SurveyQuestion = select_question(survey, 'edit')
 
             if not question:
                 # User chose to return to the update menu
                 continue
 
-            new_question = input(
+            new_question: str = input(
                 f'Enter the new question for the survey (or press Enter to keep "{question.question}"): ')
 
             if new_question:
@@ -186,7 +187,7 @@ def update_survey():
         elif choice == 'r' or choice == '5':
             # Remove survey questions
 
-            question = select_question(survey, 'remove')
+            question: SurveyQuestion = select_question(survey, 'remove')
 
             if not question:
                 # User chose to return to the update menu
@@ -203,7 +204,7 @@ def update_survey():
             print('Invalid choice. Please try again.')
 
 
-def create_survey():
+def create_survey() -> None:
     """
     Create a survey and add questions to it.
     """
@@ -211,8 +212,8 @@ def create_survey():
     print('OK, let\'s create a survey.')
     print('Firstly, we need a name for the survey.')
 
-    survey_name = input('Survey Name (this can be changed later): ')
-    survey = Survey(name=survey_name, active=False)
+    survey_name: str = input('Survey Name (this can be changed later): ')
+    survey: Survey = Survey(name=survey_name, active=False)
     db.session.add(survey)
     db.session.commit()
 
@@ -220,11 +221,11 @@ def create_survey():
     print(Colors.OKGREEN + f'Now, let\'s add some questions to {survey_name}.' + Colors.ENDC)
 
     while True:
-        question_text = input('Enter a question for the survey (or press Enter to return to the main menu): ')
+        question_text: str = input('Enter a question for the survey (or press Enter to return to the main menu): ')
         if question_text == '':
             break
 
-        question = SurveyQuestion(survey_id=survey.id, question=question_text)
+        question: SurveyQuestion = SurveyQuestion(survey_id=survey.id, question=question_text)
         db.session.add(question)
         db.session.commit()
 
@@ -235,12 +236,12 @@ def create_survey():
                          'responses.' + Colors.ENDC)
 
 
-def toggle_survey():
+def toggle_survey() -> None:
     """
     Toggles a survey's active status.
     """
 
-    survey = select_survey('toggle')
+    survey: Survey = select_survey('toggle')
 
     if not survey:
         # User chose to return to the main menu
@@ -248,29 +249,29 @@ def toggle_survey():
 
     # Toggle the survey's active status
     survey.active = not survey.active
-    new_status = 'active' if survey.active else 'inactive'
+    new_status: str = 'active' if survey.active else 'inactive'
     db.session.commit()
 
     print(Colors.OKGREEN + f'Survey {survey.name} is now {new_status}.' + Colors.ENDC)
 
 
-def delete_survey():
+def delete_survey() -> None:
     """
     Delete a survey and its questions. The active survey cannot be deleted.
     """
 
-    survey = select_survey('delete')
+    survey: Survey = select_survey('delete')
 
     if not survey:
         # User chose to return to the main menu
         return
 
     if survey.active:
-        print(Colors.FAIL + f'Survey {survey.name} is the active survey and cannot be deleted.' + Colors.ENDC)
+        print(Colors.FAIL + f'Survey {survey.name} active and cannot be deleted.' + Colors.ENDC)
         return
 
     # Confirm the user wants to delete the survey
-    confirm = input(
+    confirm: str = input(
         Colors.WARNING + f'Are you sure you want to delete survey {survey.name}? [y/n]: ' + Colors.ENDC).lower()
 
     if confirm != 'y':
@@ -287,7 +288,7 @@ def delete_survey():
     print(Colors.OKGREEN + f'Survey {survey.name} deleted.' + Colors.ENDC)
 
 
-def export_results():
+def export_results() -> None:
     """
     Export the results of a survey to a CSV file. Only inactive surveys can have their data exported.
     """
@@ -295,7 +296,7 @@ def export_results():
     print('OK, let\'s export the results of a survey.')
     print('Firstly, we need to select a survey.')
 
-    survey = select_survey('export')
+    survey: Survey = select_survey('export')
 
     if not survey:
         # User chose to return to the main menu
@@ -308,7 +309,7 @@ def export_results():
 
     print(Colors.OKGREEN + f'Exporting results for survey {survey.name}.' + Colors.ENDC)
 
-    questions = db.session.execute(db.select(SurveyQuestion).where(SurveyQuestion.survey_id == survey.id)).all()
+    questions: [SurveyQuestion] = db.session.execute(db.select(SurveyQuestion).where(SurveyQuestion.survey_id == survey.id)).all()
 
     if not questions:
         print(Colors.WARNING + 'No questions found for this survey. Start by adding some questions.' + Colors.ENDC)
@@ -327,7 +328,7 @@ def export_results():
             question = question[0]
 
             # find all responses for this question
-            responses = db.session.execute(db.select(SurveyResponse).where(SurveyResponse.question_id == question.id)).all()
+            responses: [SurveyResponse] = db.session.execute(db.select(SurveyResponse).where(SurveyResponse.question_id == question.id)).all()
 
             for response in responses:
                 response = response[0]
@@ -357,7 +358,7 @@ with app.app_context():
         print(Colors.HEADER + '| 7. [Q]uit                      |' + Colors.ENDC)
         print(Colors.HEADER + '+--------------------------------+' + Colors.ENDC)
 
-        choice = input('Enter a choice: ').lower()
+        choice: str = input('Enter a choice: ').lower()
 
         if choice == 'c' or choice == '1':
             create_survey()

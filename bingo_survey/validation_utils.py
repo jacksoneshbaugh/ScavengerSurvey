@@ -5,7 +5,7 @@ ___author___ = "Jackson Eshbaugh"
 ___version___ = "03/13/2024"
 
 
-def validate_email(email):
+def validate_email(email: str) -> bool:
     """
     Validates an email.
     :param email: The email to validate.
@@ -14,7 +14,7 @@ def validate_email(email):
     return '@' in email and '.' in email
 
 
-def validate_password(password1, password2):
+def validate_password(password1: str, password2: str) -> [bool, bool, bool, bool]:
     """
     Validates a password. Rules: at least 8 characters, at least one number, at least one special character,
     and the two passwords must match.
@@ -29,7 +29,7 @@ def validate_password(password1, password2):
     return [length, number, special, match]
 
 
-def escape_string(string):
+def escape_string(string: str) -> str:
     """
     Escapes a string.
     :param string: The string to escape.

@@ -4,50 +4,13 @@ Models for the Bingo Survey application.
 __author__ = "Jackson Eshbaugh"
 __version__ = "03/13/2024"
 
+from typing import List
+
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Relationship, Mapped
 
 from bingo_survey import login_manager, db
-
-
-class Survey(db.Model):
-    """
-    Survey model to hold a list of questions.
-    :param id: The survey's id.
-    :param name: The survey's name.
-    :param questions: The survey's questions.
-    """
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String(80), nullable=False)
-    active = Column(Boolean, nullable=False, default=True)
-
-    questions = relationship('SurveyQuestion', back_populates='survey')
-
-    def __repr__(self):
-        return f'<Survey {self.name}>'
-
-
-class SurveyQuestion(db.Model):
-    """
-    Survey question model.
-    :param id: The question's id.
-    :param survey_id: The id of the survey the question is associated with.
-    :param question: The question.
-    :param responses: The responses to the question.
-    """
-
-    id = Column(Integer, primary_key=True)
-    survey_id = Column(Integer, ForeignKey('survey.id'))
-    question = Column(String(500), nullable=False)
-
-    responses = relationship('SurveyResponse', back_populates='question')
-
-    survey = relationship('Survey', back_populates='questions')
-
-    def __repr__(self):
-        return f'<SurveyQuestion {self.question}>'
 
 
 class SurveyResponse(db.Model):
@@ -59,16 +22,17 @@ class SurveyResponse(db.Model):
     :param response: The user's response to the question.
     """
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    question_id = Column(Integer, ForeignKey('survey_question.id'))
-    response = Column(String(500), nullable=False)
+    id: Integer = Column(Integer, primary_key=True)
+    user_id: Integer = Column(Integer, ForeignKey('user.id'))
+    question_id: Integer = Column(Integer, ForeignKey('survey_question.id'))
+    response: String = Column(String(500), nullable=False)
 
-    user = relationship('User', back_populates='responses')
-    question = relationship('SurveyQuestion', back_populates='responses')
+    user: Mapped['User'] = relationship('User', back_populates='responses')
+    question: Mapped['SurveyQuestion'] = relationship('SurveyQuestion', back_populates='responses')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<SurveyResponse {self.response}>'
+
 
 
 class User(db.Model):
@@ -81,26 +45,26 @@ class User(db.Model):
     :param password: The user's password. Will be hashed.
     :param authenticated: Whether the user is authenticated.
     """
-    id = Column(Integer, primary_key=True)
-    name = Column(String(80), unique=True, nullable=False)
-    email = Column(String(120), unique=True, nullable=False)
-    password = Column(String(80), nullable=False)
-    authenticated = Column(Boolean, default=False)
+    id: Integer = Column(Integer, primary_key=True)
+    name: String = Column(String(80), unique=True, nullable=False)
+    email: String = Column(String(120), unique=True, nullable=False)
+    password: String = Column(String(80), nullable=False)
+    authenticated: Boolean = Column(Boolean, default=False)
 
-    responses = relationship('SurveyResponse', back_populates='user')
+    responses: Mapped[List[SurveyResponse]] = relationship('SurveyResponse', back_populates='user')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<User {self.email}>'
 
     @property
-    def is_authenticated(self):
+    def is_authenticated(self) -> Boolean:
         """
         Checks if the user is authenticated.
         :return: True if the user is authenticated, False otherwise.
         """
         return self.authenticated
 
-    def get_id(self):
+    def get_id(self) -> Integer:
         """
         Gets the user's id.
         :return: The user's id.
@@ -108,7 +72,7 @@ class User(db.Model):
         return self.id
 
     @property
-    def is_active(self):
+    def is_active(self) -> bool:
         """
         All users are active.
         :return: True
@@ -116,7 +80,7 @@ class User(db.Model):
         return True
 
     @property
-    def is_anonymous(self):
+    def is_anonymous(self) -> bool:
         """
         Anonymous users are not supported.
         :return: False
@@ -128,7 +92,7 @@ pass
 
 
 @login_manager.user_loader
-def user_loader(user_id):
+def user_loader(user_id) -> User | None:
     """
      Given a *user_id*, return the associated User object.
      :return: The User object.
@@ -138,7 +102,7 @@ def user_loader(user_id):
 
 
 @login_manager.request_loader
-def request_loader(request):
+def request_loader(request) -> User | None:
     """
      Given a *request*, return a User object or None.
      :return: The User object or None.
@@ -146,3 +110,42 @@ def request_loader(request):
     email = request.form.get('email')
     result = db.session.execute(db.select(User).where(User.email == email)).first()
     return result[0] if result else None
+
+
+
+class Survey(db.Model):
+    """
+    Survey model to hold a list of questions.
+    :param id: The survey's id.
+    :param name: The survey's name.
+    :param questions: The survey's questions.
+    """
+
+    id: Integer = Column(Integer, primary_key=True)
+    name: String = Column(String(80), nullable=False)
+    active: Boolean = Column(Boolean, nullable=False, default=True)
+
+    questions: Mapped[List['SurveyQuestion']] = relationship('SurveyQuestion', back_populates='survey')
+
+    def __repr__(self) -> str:
+        return f'<Survey {self.name}>'
+
+class SurveyQuestion(db.Model):
+    """
+    Survey question model.
+    :param id: The question's id.
+    :param survey_id: The id of the survey the question is associated with.
+    :param question: The question.
+    :param responses: The responses to the question.
+    """
+
+    id: Integer = Column(Integer, primary_key=True)
+    survey_id: Integer = Column(Integer, ForeignKey('survey.id'))
+    question: String = Column(String(500), nullable=False)
+
+    responses: Mapped[List[SurveyResponse]] = relationship('SurveyResponse', back_populates='question')
+
+    survey: Mapped[Survey] = relationship('Survey', back_populates='questions')
+
+    def __repr__(self) -> str:
+        return f'<SurveyQuestion {self.question}>'
