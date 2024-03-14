@@ -11,8 +11,8 @@
 /**
  * Opens the modal and sets the prompt to the given value.
  *
- * @param prompt the prompt to display in the modal
- * @param promptId the id of the prompt to submit a response for
+ * @param {String} prompt the prompt to display in the modal
+ * @param {String} promptId the id of the prompt to submit a response for
  */
 function openModal(prompt, promptId) {
     document.getElementById('modal-prompt').innerHTML = prompt;
@@ -25,9 +25,9 @@ function openModal(prompt, promptId) {
  * response to the given value, because this function is called when the user
  * has already submitted a response for the given prompt.
  *
- * @param prompt the prompt to display in the modal
- * @param promptId the id of the prompt to submit a response for
- * @param response the response to display in the modal
+ * @param {String} prompt the prompt to display in the modal
+ * @param {String} promptId the id of the prompt to submit a response for
+ * @param {String} response the response to display in the modal
  */
 function openModalWithResponse(prompt, promptId, response) {
     document.getElementById('modal-prompt').innerHTML = prompt;
@@ -48,7 +48,7 @@ function closeModal() {
  * Listens for the user to click anywhere outside the modal and closes the
  * modal if so.
  *
- * @param event the event that triggered the listener
+ * @param {MouseEvent} event the event that triggered the listener
  */
 window.onclick = function(event) {
     if (event.target === document.getElementById('modal')) {
