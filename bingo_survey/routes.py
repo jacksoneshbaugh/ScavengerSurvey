@@ -19,31 +19,35 @@ from flask import flash
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
+from werkzeug import Response
+from werkzeug.datastructures import ImmutableMultiDict
 
 from bingo_survey import app, db
-from bingo_survey.models import Survey, SurveyResponse, User
+from bingo_survey.models import Survey, SurveyResponse, User, SurveyQuestion
 from bingo_survey.validation_utils import validate_email, validate_password, escape_string
 
 
 # Routes
 
 @app.route('/', methods=['GET'])
-@login_required
-def index():
+def index() -> Response | str:
     """
     Renders the index page, unless the user is logged in. Then it redirects to the board.
 
     :return: the rendered index page.
     """
 
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+
     # get all active surveys.
 
-    surveys = db.session.execute(db.select(Survey).where(Survey.active == True)).all()
+    surveys: [Survey] = db.session.execute(db.select(Survey).where(Survey.active == True)).all()
 
     if not surveys:
         return render_template('index.html', title='Choose a Survey', data=None)
 
-    board = []
+    board: [Survey] = []
 
     for survey in surveys:
         survey = survey[0]
@@ -51,12 +55,15 @@ def index():
 
     if len(board) == 1:
 
-        bingo_board = []
+        # Treat the index as a normal board if there is only one survey
+
+        bingo_board: [SurveyQuestion] = []
         for question in board[0].questions:
             # Check if the user has responded to the question
-            response = (db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
-                                                                           SurveyResponse.question_id == question.id))
-                        .first())
+            response: SurveyResponse = (
+                db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
+                                                                   SurveyResponse.question_id == question.id))
+                .first())
             if response:
                 response = response[0]
 
@@ -65,8 +72,6 @@ def index():
                                 'response': response.response if response else ''
                                 })
 
-            print(bingo_board)
-
         return render_template('board.html', title=board[0].name, data=bingo_board, escape_string=escape_string,
                                id=board[0].id, one_survey_active=True)
 
@@ -74,7 +79,7 @@ def index():
 
 
 @app.route('/board/<int:id>', methods=['GET', 'POST'])
-def bingo_board(id):
+def bingo_board(id: int) -> Response | str:
     """
     Renders the bingo board for the given ID.
     :param id: the ID to render the bingo board for.
@@ -82,19 +87,20 @@ def bingo_board(id):
     """
 
     if flask.request.method == 'POST':
-        form = flask.request.form
+        form: ImmutableMultiDict[str, str] = flask.request.form
         # Ony receive one response to one question each time
-        question_id = form['prompt_id']
-        response = form['response']
+        question_id: str = form['prompt_id']
+        response: str = form['response']
 
         if not response or not question_id:
             return redirect(url_for('bingo_board', id=id))
 
         # save the response - if it exists, update it
 
-        survey_response = (db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
-                                                                              SurveyResponse.question_id == question_id))
-                           .first())
+        survey_response: SurveyResponse = (
+            db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
+                                                               SurveyResponse.question_id == question_id))
+            .first())
         if survey_response:
             survey_response = survey_response[0]
             survey_response.response = response
@@ -103,12 +109,13 @@ def bingo_board(id):
 
         # The question hasn't been answered yet, so add a new response
 
-        survey_response = SurveyResponse(user_id=current_user.id, question_id=question_id, response=response)
+        survey_response: SurveyResponse = SurveyResponse(user_id=current_user.id, question_id=question_id,
+                                                         response=response)
         db.session.add(survey_response)
         db.session.commit()
 
     # Get the survey from the database
-    survey = db.session.execute(db.select(Survey).where(Survey.id == id)).first()
+    survey: Survey = db.session.execute(db.select(Survey).where(Survey.id == id)).first()
 
     if not survey:
         return redirect(url_for('bingo_board', id=id))
@@ -120,12 +127,13 @@ def bingo_board(id):
 
     # Construct the board to send to the view
 
-    board = []
+    board: [Survey] = []
     for question in survey.questions:
         # Check if the user has responded to the question
-        response = (db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
-                                                                       SurveyResponse.question_id == question.id))
-                    .first())
+        response: SurveyResponse = (
+            db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
+                                                               SurveyResponse.question_id == question.id))
+            .first())
         if response:
             response = response[0]
 
@@ -134,11 +142,9 @@ def bingo_board(id):
 
         return render_template('board.html', title=survey.name, data=board, escape_string=escape_string, id=id)
 
-    # The user is submitting a response
-
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login() -> Response | str:
     """
     Renders the login page or redirects to the board if the user is already logged in.
     Also logs the user in.
@@ -151,7 +157,7 @@ def login():
     if flask.request.method == 'GET':
         return render_template('login.html', title='Login')
 
-    form = flask.request.form
+    form: ImmutableMultiDict[str, str] = flask.request.form
 
     if not form['email']:
         flash("Email is required.", "error")
@@ -162,11 +168,11 @@ def login():
     if not form['email'] or not form['password']:
         return redirect(url_for('login'))
 
-    email = form['email']
-    password = form['password']
+    email: str = form['email']
+    password: str = form['password']
 
-    result = db.session.execute(db.select(User).where(User.email == email)).first()
-    user = result[0] if result else None
+    result: [User] = db.session.execute(db.select(User).where(User.email == email)).first()
+    user: User | None = result[0] if result else None
 
     if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
 
@@ -184,7 +190,7 @@ def login():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
+def register() -> Response | str:
     """
     Renders the registration page or registers the user.
     :return: the rendered registration page or a redirect to the login page.
@@ -196,7 +202,7 @@ def register():
     if flask.request.method == 'GET':
         return render_template('register.html', title='Register')
 
-    form = flask.request.form
+    form: ImmutableMultiDict[str, str] = flask.request.form
 
     # Ensure all fields are filled out
     if not form['email']:
@@ -218,14 +224,14 @@ def register():
     if not form['email'] or not form['password1'] or not form['password2'] or not form['name']:
         return redirect(url_for('register'))
 
-    email = form['email']
-    name = form['name']
-    password1 = form['password1']
-    password2 = form['password2']
+    email: str = form['email']
+    name: str = form['name']
+    password1: str = form['password1']
+    password2: str = form['password2']
 
     # Validate email and password
-    email_valid = validate_email(email)
-    password_valid = validate_password(password1, password2)
+    email_valid: bool = validate_email(email)
+    password_valid: [bool] = validate_password(password1, password2)
 
     # Compile all error messages and redirect if any errors
 
@@ -244,20 +250,20 @@ def register():
     if not password_valid[3]:
         flash("Passwords do not match.", "error")
 
-    if not email_valid or not password_valid[0] or not password_valid[1] or not password_valid[2] or not password_valid[
-        3]:
+    if (not email_valid or not password_valid[0] or not password_valid[1] or not password_valid[2]
+            or not password_valid[3]):
         return redirect(url_for('register'))
 
     # We have valid entries at this point.
     # Next, check to see if the email is already in use.
 
-    user = User.query.filter_by(email=email).first()
+    user: User = db.session.execute(db.select(User).where(User.email == email)).first()
     if user:
         flash("This email is already in use. Maybe you meant to login?", "error")
         return redirect(url_for('register'))
 
-    hashed_password = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
-    user = User(name=name, email=email, password=hashed_password)
+    hashed_password: bytes = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
+    user: User = User(name=name, email=email, password=hashed_password)
     db.session.add(user)
     db.session.commit()
 
@@ -267,13 +273,13 @@ def register():
 
 @app.route('/logout')
 @login_required
-def logout():
+def logout() -> Response:
     """
     Logs the user out.
     :return: a redirect to the index page.
     """
 
-    user = current_user
+    user: User = current_user
     user.authenticated = False
     db.session.commit()
     flask_login.logout_user()
