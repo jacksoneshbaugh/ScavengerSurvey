@@ -1,0 +1,3 @@
+# Only production-specific requirements-- need other requirements also.
+
+gunicorn==21.2.0
