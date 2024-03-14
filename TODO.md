@@ -15,6 +15,7 @@
 - [x] Implement the possibility to have multiple boards active at one time
   - This will involve implementing a board chooser if and only if there are multiple boards active
 - [x] Beautify the CSS code
+- [ ] Implement a reverse animation of the modal slide in for when it closes
 - [ ] Work on README.md and GitHub documentation.
 - [ ] Possibly create an install script?
 - [ ] Question Types
