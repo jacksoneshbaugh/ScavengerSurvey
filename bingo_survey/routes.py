@@ -30,13 +30,15 @@ from bingo_survey.validation_utils import validate_email, validate_password, esc
 # Routes
 
 @app.route('/', methods=['GET'])
-@login_required
-def index() -> str:
+def index() -> Response | str:
     """
     Renders the index page, unless the user is logged in. Then it redirects to the board.
 
     :return: the rendered index page.
     """
+
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
 
     # get all active surveys.
 
