@@ -10,16 +10,17 @@ services:
     env_file:
       - ".env"
     environment:
-      DATABASE_URI: "mysql://flask:BADPASSWD@db/bingodb"
+      DATABASE_URI: "mysql://flask:BADPASSWD@db:3306/bingodb"
     ports:
       - "8080:80"
     networks:
+      - server
       - backend
+    depends_on:
+      db:
+        condition: service_healthy
   db:
     image: mysql:8.3
-    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
-    # (this is just an example, not intended to be a production configuration)
-    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: yes
@@ -28,7 +29,17 @@ services:
       MYSQL_DATABASE: bingodb
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+
+# TODO: Use volumes to allow db persistence
 
 networks:
-  backend:
+  server:  # Outward facing, makes a bridge for hosting the webapp
     driver: bridge
+  backend: # Internal; just for the app to communicate with the db
+    driver: bridge
+    internal: true
