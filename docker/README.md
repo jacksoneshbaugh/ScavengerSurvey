@@ -55,5 +55,22 @@ A volume will be automatically created by docker-compose for database persistenc
 ## Database Healthcheck and Startup Procedure
 The app container will not start until the database has passed its healthcheck and is ready to start receiving requests. See `docker-compose.yaml`.
 
-## Empty Certificates
+## Testing With SSL/TLS
+To test SSL/TLS functionality, generate a self-signed certificate.
+To use openssl, simply run the following:
+```bash
+openssl req  -nodes -new -x509  -keyout server.key -out server.cert
+```
+
+Then, in the `.env` mentioned above, use the following lines:
+``` bash
+SSL_CERT="server.key"
+SSL_KEY="server.cert"
+```
+
+There is no need to rebuild the images if already built, but the containers should be restarted for the change to take effect.
+
+A self-signed certificate should not be used in production. Obtain keys from LetsEncrypt or similar.
+
+## Empty Certificate Files
 `nocert.pem` and `nokey.pem` should be left as blank files- these are bind-mounted as volumes to the container if no keys are specified in the `.env` and should be blank so the server knows not to try to run in SSL/TLS mode.

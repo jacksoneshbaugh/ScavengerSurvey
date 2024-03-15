@@ -87,3 +87,9 @@ venv.bak/
 
 # Pyre type checker
 .pyre/
+
+# SSL/TLS Certs
+docker/server.cert
+docker/server.key
+server.cert
+server.key
