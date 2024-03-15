@@ -2,10 +2,11 @@ version: '3.8'
 
 services:
   app:
-    # TODO: Use volume to store generated secret key?
     build:
       context: ..
       dockerfile: docker/app/app.Dockerfile
+    # To enable docker-compose push to push image to Docker Hub
+    #image: docker-hub-id/web:latest
     restart: always
     environment:
       DATABASE_URI: "mysql://flask:${MYSQL_PASSWD}@db/bingodb"
