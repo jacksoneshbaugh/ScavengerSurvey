@@ -54,3 +54,6 @@ A volume will be automatically created by docker-compose for database persistenc
 
 ## Database Healthcheck and Startup Procedure
 The app container will not start until the database has passed its healthcheck and is ready to start receiving requests. See `docker-compose.yaml`.
+
+## Empty Certificates
+`nocert.pem` and `nokey.pem` should be left as blank files- these are bind-mounted as volumes to the container if no keys are specified in the `.env` and should be blank so the server knows not to try to run in SSL/TLS mode.
