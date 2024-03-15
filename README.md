@@ -4,12 +4,16 @@
 ### What is BingoSurvey? 
 Bingo Survey is a webapp that allows for the formatting of a survey as a bingo board. This allows for a more interactive and fun way to conduct surveys. Administrators can create boards, and users can fill them out. The results are then stored in a database and can be exported to a CSV file.
 
+---
+
 ### Features
 - Surveys as bingo boards!
 - Results can be exported to a CSV file.
 - Active and inactive boards—only active boards can be played.
   - Multiple boards can be active at once.
 - User accounts—you must be registered to play.
+
+---
 
 ### How to run BingoSurvey (in development mode)
 1. Clone the repository.
@@ -60,9 +64,89 @@ For Windows:
 start_dev.bat
 ```
 
-### How to deploy BingoSurvey (in production mode)
-*This section is a work in progress. Please check back later for a more finalized version. Thanks!*
+6. The server will display the address and port that the app is running on. Open a web browser and navigate to that address and port, and you're good to go!
 
+---
+
+### How to deploy BingoSurvey (in production mode)
+Thanks to snorklerjoe for the Docker deployment setup and instructions! I'll copy them here, or you can view the original instructions at ``docker/README.md``.
+
+Docker-Compose is used to create two containers--
+
+- **app**  
+    This includes a GUnicorn WSGI server and the BingoSurvey Flask app.
+- **db**  
+    This is just a MySQL container connected to BingoSurvey-App.
+
+#### Building
+
+To build the production images, from this directory, run
+``` bash
+docker compose build
+```
+
+#### Running
+
+To use the production containers, after building, create a `.env` file of the following sort:
+``` bash
+# Required for the Flask app
+SECRET_KEY="CHANGE THIS"
+SESSION_COOKIE_SECURE=False
+SESSION_COOKIE_HTTPONLY=True
+SESSION_COOKIE_SAMESITE="<Strict/Lax/None>"
+
+# For communication with the database
+MYSQL_PASSWD="ChangeThisPasswd"
+
+# Ports to bind to; specify if different ports are required
+#HTTP_PORT=80
+#HTTPS_PORT=443  # Irrelevant if cert/key are not specified
+
+# For SSL/TLS; Both SSL_PEM and SSL_KEY must be specified
+#SSL_CERT="/path/to/ssl.cert"
+#SSL_KEY="/path/to/ssl.key"
+```
+
+... and then run
+``` bash
+docker compose up
+```
+
+to start the containers, and
+
+``` bash
+docker compose down
+```
+to stop and remove/clean up the containers.
+
+#### Database Persistence
+A volume will be automatically created by docker-compose for database persistence. Even after rebuilding the images or stopping the containers, this volume will still be present until deleted manually.
+
+
+#### Database Healthcheck and Startup Procedure
+The app container will not start until the database has passed its healthcheck and is ready to start receiving requests. See `docker-compose.yaml`.
+
+#### Testing With SSL/TLS
+To test SSL/TLS functionality, generate a self-signed certificate.
+To use openssl, simply run the following:
+```bash
+openssl req  -nodes -new -x509  -keyout server.key -out server.cert
+```
+
+Then, in the `.env` mentioned above, use the following lines:
+``` bash
+SSL_CERT="server.key"
+SSL_KEY="server.cert"
+```
+
+There is no need to rebuild the images if already built, but the containers should be restarted for the change to take effect.
+
+A self-signed certificate should not be used in production. Obtain keys from LetsEncrypt or similar.
+
+#### Empty Certificate Files
+`nocert.pem` and `nokey.pem` should be left as blank files- these are bind-mounted as volumes to the container if no keys are specified in the `.env` and should be blank so the server knows not to try to run in SSL/TLS mode.
+
+----
 
 ### How to use BingoSurvey
 #### Administration
@@ -74,8 +158,12 @@ python admin/admin.py
 
 You will be greeted with a menu. The CLI is (in my opinion) very intuitive—and dare I say, friendly—but everything you need to know is located in the GitHub Wiki for this project.
 
+---
+
 ### What is the story behind BingoSurvey?
 BingoSurvey originated from a request from a friend I know from Lafayette College. He asked me if I knew of any websites that allowed for a progressive game to be played with a bingo board style survey component. He was planning a game about networking and wanted to have a week-long game where people could fill out a survey in the form of a bingo board. Since I couldn't find any websites that did this (and I was on spring break), I decided to make one myself.
+
+---
 
 ### What is the future of BingoSurvey?
 Here's a short (hopefully up-to-date) list of features that I'd love to implement in the future:
@@ -87,16 +175,24 @@ Here's a short (hopefully up-to-date) list of features that I'd love to implemen
   - Currently, the only thing you can do with a user account is to play a board. It would be nice to have more robust user accounts, such as the ability to create boards, or to view past results.
 You can see the full list of features I'd like to implement in the TODO.md file.
 
+---
+
 ### Reporting a bug
 If you find a bug, please create an issue on GitHub and add the "bug" label. Please include as much information as possible, such as the steps to reproduce the bug, the expected behavior, and the actual behavior.
 
+---
+
 ### How to contribute
 If you have any ideas for features, please let me know by creating an issue on GitHub and adding the "suggestion" label. Or, if you're feeling ambitious, you can fork the repository and create a pull request with your feature implemented! There are no requirements for contributing, apart from ensuring that your code is documented.
+
+---
 
 ### Contact
 If you have any questions, please feel free to reach out to me:
 - GitHub Issue Tracker (preferred for bug reports and feature suggestions or other things related to the project)
 - Email (better for other inquiries): [eshbaugj@lafayette.edu](mailto:eshbaugj@lafayette.edu)
+
+---
 
 ### License
 
