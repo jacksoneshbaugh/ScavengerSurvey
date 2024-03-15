@@ -12,7 +12,6 @@ Bingo Survey is a webapp that allows for the formatting of a survey as a bingo b
 - User accounts—you must be registered to play.
 
 ### How to run BingoSurvey (in development mode)
-*This section is a work in progress. Please check back later for a more finalized version. Thanks!*
 1. Clone the repository.
 
 2. Create a virtual environment using venv:
