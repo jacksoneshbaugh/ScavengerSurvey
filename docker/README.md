@@ -14,9 +14,9 @@ To build the production images, from this directory, run
 docker compose build
 ```
 
-## Testing
+## Running
 
-To test the production containers, after building, create a `.env` file of the following sort:
+To use the production containers, after building, create a `.env` file of the following sort:
 ``` bash
 # Required for the Flask app
 SECRET_KEY="CHANGE THIS"
