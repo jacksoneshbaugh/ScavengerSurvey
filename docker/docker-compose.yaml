@@ -7,35 +7,52 @@ services:
       context: ..
       dockerfile: docker/app/app.Dockerfile
     restart: always
-    env_file:
-      - ".env"
     environment:
-      DATABASE_URI: "mysql://flask:BADPASSWD@db:3306/bingodb"
+      DATABASE_URI: "mysql://flask:${MYSQL_PASSWD}@db/bingodb"
+
+      SECRET_KEY: ${SECRET_KEY:?Specify a unique key for this deployment}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:?Specify <True/False>}
+      SESSION_COOKIE_HTTPONLY: ${SESSION_COOKIE_HTTPONLY:?Specify <True/False>}
+      SESSION_COOKIE_SAMESITE: ${SESSION_COOKIE_SAMESITE:?Specify <Strict/Lax/None>}
     ports:
-      - "8080:80"
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
     networks:
       - server
       - backend
+    volumes:
+      # TLS/SSL certs:
+      - type: bind
+        source: ${SSL_CERT:-nocert.pem}
+        target: /etc/ssl/server_cert.pem
+      - type: bind
+        source: ${SSL_KEY:-nokey.pem}
+        target: /etc/ssl/server_key.pem
     depends_on:
-      db:
+      db:  # Won't come up until db is passing its healthcheck
         condition: service_healthy
+
   db:
     image: mysql:8.3
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: yes
       MYSQL_USER: flask
-      MYSQL_PASSWORD: BADPASSWD
+      MYSQL_PASSWORD: ${MYSQL_PASSWD:?A MySQL Password MUST be set}
       MYSQL_DATABASE: bingodb
     networks:
       - backend
+    command: --default-authentication-plugin=caching_sha2_password
+    volumes:
+      - db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 5s
-      retries: 10
+          test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+          timeout: 10s
+          interval: 5s
+          retries: 20
 
-
-# TODO: Use volumes to allow db persistence
+volumes:
+  db-data:
 
 networks:
   server:  # Outward facing, makes a bridge for hosting the webapp

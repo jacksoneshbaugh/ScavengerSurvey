@@ -16,12 +16,24 @@ docker compose build
 
 ## Testing
 
-To test the production containers, after building, create a .env file of the following sort:
-``` env
+To test the production containers, after building, create a `.env` file of the following sort:
+``` bash
+# Required for the Flask app
 SECRET_KEY="CHANGE THIS"
 SESSION_COOKIE_SECURE=False
 SESSION_COOKIE_HTTPONLY=True
 SESSION_COOKIE_SAMESITE="<Strict/Lax/None>"
+
+# For communication with the database
+MYSQL_PASSWD="ChangeThisPasswd"
+
+# Ports to bind to; specify if different ports are required
+#HTTP_PORT=80
+#HTTPS_PORT=443  # Irrelevant if cert/key are not specified
+
+# For SSL/TLS; Both SSL_PEM and SSL_KEY must be specified
+#SSL_CERT="/path/to/ssl.cert"
+#SSL_KEY="/path/to/ssl.key"
 ```
 
 ... and then run
@@ -36,5 +48,9 @@ docker compose down
 ```
 to stop and remove/clean up the containers.
 
+## Database Persistence
+A volume will be automatically created by docker-compose for database persistence. Even after rebuilding the images or stopping the containers, this volume will still be present until deleted manually.
 
-### TODO: Database persistence & Document volume used for such a purpose
+
+## Database Healthcheck and Startup Procedure
+The app container will not start until the database has passed its healthcheck and is ready to start receiving requests. See `docker-compose.yaml`.
