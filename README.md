@@ -69,7 +69,7 @@ start_dev.bat
 ---
 
 ### How to deploy BingoSurvey (in production mode)
-Thanks to snorklerjoe for the Docker deployment setup and instructions! I'll copy them here, or you can view the original instructions at ``docker/README.md``.
+Thanks to snorklerjoe for the Docker deployment setup and instructions! I'll copy them here, or you can view the original instructions at ``docker/README.md``. Keep in mind that these instructions are meant to be followed in the ``docker`` directory.
 
 Docker-Compose is used to create two containers--
 
@@ -79,6 +79,11 @@ Docker-Compose is used to create two containers--
     This is just a MySQL container connected to BingoSurvey-App.
 
 #### Building
+
+If you are not already in the ``docker`` directory, navigate there:
+```bash
+cd docker
+```
 
 To build the production images, from this directory, run
 ``` bash
