@@ -38,6 +38,7 @@ def index() -> Response | str:
     """
 
     if not current_user.is_authenticated:
+        print('not authenticated')
         return redirect(url_for('login'))
 
     # get all active surveys.
@@ -172,7 +173,7 @@ def login() -> Response | str:
     password: str = form['password']
 
     result: [User] = db.session.execute(db.select(User).where(User.email == email)).first()
-    user: User | None = result[0] if result else None
+    user: User = result[0] if result else None
 
     if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
 
@@ -180,7 +181,7 @@ def login() -> Response | str:
         db.session.commit()
 
         if flask_login.login_user(user):
-            return redirect(url_for('bingo_board'))
+            return redirect(url_for('index'))
         else:
             flash("Error authenticating", "error")
             return redirect(url_for('login'))
