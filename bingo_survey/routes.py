@@ -45,6 +45,8 @@ def index() -> Response | str:
 
     surveys: [Survey] = db.session.execute(db.select(Survey).where(Survey.active == True)).all()
 
+    print(surveys)
+
     if not surveys:
         return render_template('index.html', title='Choose a Survey', data=None)
 
@@ -55,26 +57,8 @@ def index() -> Response | str:
         board.append(survey)
 
     if len(board) == 1:
-
-        # Treat the index as a normal board if there is only one survey
-
-        bingo_board: [SurveyQuestion] = []
-        for question in board[0].questions:
-            # Check if the user has responded to the question
-            response: SurveyResponse = (
-                db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
-                                                                   SurveyResponse.question_id == question.id))
-                .first())
-            if response:
-                response = response[0]
-
-            bingo_board.append({'id': question.id,
-                                'prompt': question.question,
-                                'response': response.response if response else ''
-                                })
-
-        return render_template('board.html', title=board[0].name, data=bingo_board, escape_string=escape_string,
-                               id=board[0].id, one_survey_active=True)
+        # Treat the index as a normal board if there is only one survey—redirect to the board.
+        return redirect(url_for('bingo_board', id=board[0].id))
 
     return render_template('index.html', title='Choose a Survey', data=board)
 
@@ -123,13 +107,23 @@ def bingo_board(id: int) -> Response | str:
 
     survey = survey[0]
 
+    survey_name = survey.name
+
     if not survey.active:
         return redirect(url_for('bingo_board', id=id))
 
     # Construct the board to send to the view
 
-    board: [Survey] = []
-    for question in survey.questions:
+    question_response = db.session.execute(db.select(SurveyQuestion).where(SurveyQuestion.survey_id == id)).all()
+
+    if not question_response:
+        return 'a very strange error occurred. This survey should have at least a question!' # This should never happen.
+
+    print(question_response)
+
+    board: [SurveyQuestion] = []
+    for question in question_response:
+        question = question[0]
         # Check if the user has responded to the question
         response: SurveyResponse = (
             db.session.execute(db.select(SurveyResponse).where(SurveyResponse.user_id == current_user.id,
@@ -141,7 +135,26 @@ def bingo_board(id: int) -> Response | str:
         board.append({'id': question.id, 'prompt': question.question,
                       'response': response.response if response else ''})
 
-        return render_template('board.html', title=survey.name, data=board, escape_string=escape_string, id=id)
+        print(board)
+
+    # Check if there is more than one survey
+
+    response: [Survey] = db.session.execute(db.select(Survey).where(Survey.active == True)).all()
+
+    if not response:
+        return 'a very strange error occurred. Abby G.' # This should never happen.
+
+    surveys: [Survey] = []
+
+    for survey in response:
+        survey = survey[0]
+        surveys.append(survey)
+
+    if len(surveys) == 1:
+        return render_template('board.html', title=survey_name, data=board, escape_string=escape_string, id=id,
+                               one_survey_active=True)
+
+    return render_template('board.html', title=survey_name, data=board, escape_string=escape_string, id=id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
