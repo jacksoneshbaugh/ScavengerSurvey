@@ -8,6 +8,7 @@ ___author___ = "Jackson Eshbaugh"
 ___version___ = "03/11/2024"
 
 import os
+import typing
 
 import bcrypt
 import flask
@@ -186,7 +187,7 @@ def login() -> Response | str:
     password: str = form['password']
 
     result: [User] = db.session.execute(db.select(User).where(User.email == email)).first()
-    user: User = result[0] if result else None
+    user: typing.Optional[User] = result[0] if result else None
 
     if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
 
