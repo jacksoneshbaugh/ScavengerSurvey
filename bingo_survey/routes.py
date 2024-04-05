@@ -118,9 +118,8 @@ def bingo_board(id: int) -> Response | str:
     question_response = db.session.execute(db.select(SurveyQuestion).where(SurveyQuestion.survey_id == id)).all()
 
     if not question_response:
-        return 'a very strange error occurred. This survey should have at least a question!' # This should never happen.
-
-    print(question_response)
+        return 'a very strange error occurred. This survey should have at least a question!'  # This should never
+        # happen.
 
     board: [SurveyQuestion] = []
     for question in question_response:
@@ -133,17 +132,15 @@ def bingo_board(id: int) -> Response | str:
         if response:
             response = response[0]
 
-        board.append({'id': question.id, 'prompt': question.question,
+        board.append({'id': question.id, 'prompt': question.question, 'short_prompt': question.short_question,
                       'response': response.response if response else ''})
-
-        print(board)
 
     # Check if there is more than one survey
 
     response: [Survey] = db.session.execute(db.select(Survey).where(Survey.active == True)).all()
 
     if not response:
-        return 'a very strange error occurred. Abby G.' # This should never happen.
+        return 'a very strange error occurred. Abby G.'  # This should never happen.
 
     surveys: [Survey] = []
 

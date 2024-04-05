@@ -225,11 +225,15 @@ def create_survey() -> None:
         if question_text == '':
             break
 
-        question: SurveyQuestion = SurveyQuestion(survey_id=survey.id, question=question_text)
+        short_question: str = input('Enter a short question title (to display in the scavenger hunt box): ')
+        if short_question == '':
+            short_question = question_text
+
+        question: SurveyQuestion = SurveyQuestion(survey_id=survey.id, question=question_text, short_question=short_question)
         db.session.add(question)
         db.session.commit()
 
-        print(Colors.OKGREEN + f'Question "{question_text}" added to survey {survey_name}.' + Colors.ENDC)
+        print(Colors.OKGREEN + f'Question "{question_text}" ("{short_question}") added to survey {survey_name}.' + Colors.ENDC)
 
     print(
         Colors.OKGREEN + 'Survey creation complete. Remember, you\'ll need to activate this survey to accept '

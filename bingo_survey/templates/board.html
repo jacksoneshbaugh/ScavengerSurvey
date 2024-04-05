@@ -11,7 +11,7 @@
                 {% else %}
                     <div class="square" onclick="openModal('{{ escape_string(square.prompt) }}', {{ square.id }})">
                 {% endif %}
-                        {{ square.prompt }}
+                        {{ square.short_prompt }}
                     </div>
             {% endfor %}
             </div>

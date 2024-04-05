@@ -34,7 +34,6 @@ class SurveyResponse(db.Model):
         return f'<SurveyResponse {self.response}>'
 
 
-
 class User(db.Model):
     """
     User model.
@@ -112,7 +111,6 @@ def request_loader(request) -> User | None:
     return result[0] if result else None
 
 
-
 class Survey(db.Model):
     """
     Survey model to hold a list of questions.
@@ -130,18 +128,21 @@ class Survey(db.Model):
     def __repr__(self) -> str:
         return f'<Survey {self.name}>'
 
+
 class SurveyQuestion(db.Model):
     """
     Survey question model.
     :param id: The question's id.
     :param survey_id: The id of the survey the question is associated with.
     :param question: The question.
+    :param short_question: The short question title (to display in the scavenger hunt box).
     :param responses: The responses to the question.
     """
 
     id: Integer = Column(Integer, primary_key=True)
     survey_id: Integer = Column(Integer, ForeignKey('survey.id'))
     question: String = Column(String(500), nullable=False)
+    short_question: String = Column(String(100), nullable=False)
 
     responses: Mapped[List[SurveyResponse]] = relationship('SurveyResponse', back_populates='question')
 

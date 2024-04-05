@@ -7,18 +7,17 @@
     <body>
         <!-- Navbar with login/logout link at right, name at left -->
         <div class="navbar">
-            <!-- Display "Lafayette Bingo Survey" -->
-            <a href="">Lafayette Bingo Survey</a>
+            <a href="">Lafayette Scavenger Hunt</a>
 
                 {% if current_user.is_authenticated %}
                     <span class="navbar-right">
-                        <span class="user-name">{{ current_user.name }}</span>
                         <a href="{{ url_for('logout') }}">Logout</a>
                     </span>
                 {% else %}
                     <span class="navbar-right">
                         <a href="{{ url_for('login') }}">Login</a>
-                        <a href="{{ url_for('register') }}">Register</a></span>
+                        <a href="{{ url_for('register') }}">Register</a>
+                    </span>
                 {% endif %}
         </div>
         {% include 'messages.html' %}

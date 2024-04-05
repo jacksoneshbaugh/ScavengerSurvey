@@ -219,9 +219,6 @@ body {
 /* Footer */
 
 .footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
     width: 100%;
     background-color: #65001c;
     color: white;
@@ -269,6 +266,13 @@ body {
     margin-bottom: 10px;
     opacity: 0.8;
     font-size: 1em;
+}
+
+/* or register / or login links */
+.form-container a {
+    color: #4ea8d8;
+    text-align: center;
+    display: block;
 }
 
 .form-container .btn:hover, .form-container .cancel:hover {
