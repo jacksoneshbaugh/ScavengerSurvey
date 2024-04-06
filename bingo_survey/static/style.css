@@ -466,3 +466,11 @@ body {
         margin-left: .5em;
     }
 }
+
+/* Validation Survey Link */
+
+.survey-link {
+    text-align: center;
+    margin-top: 1em;
+    color: #4ea8d8;
+}
