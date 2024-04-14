@@ -23,5 +23,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 db: SQLAlchemy = SQLAlchemy(app)
 migrate: Migrate = Migrate(app, db)
 login_manager: LoginManager = LoginManager(app)
+login_manager.login_view = 'login'
 
 from bingo_survey import routes, models

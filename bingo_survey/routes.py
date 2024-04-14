@@ -39,7 +39,6 @@ def index() -> Response | str:
     """
 
     if not current_user.is_authenticated:
-        print('not authenticated')
         return redirect(url_for('login'))
 
     # get all active surveys.
@@ -63,7 +62,6 @@ def index() -> Response | str:
 
     return render_template('index.html', title='Choose a Survey', data=board)
 
-
 @app.route('/board/<int:id>', methods=['GET', 'POST'])
 def bingo_board(id: int) -> Response | str:
     """
@@ -71,6 +69,9 @@ def bingo_board(id: int) -> Response | str:
     :param id: the ID to render the bingo board for.
     :return: the rendered bingo board for the given ID.
     """
+
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
 
     if flask.request.method == 'POST':
         form: ImmutableMultiDict[str, str] = flask.request.form
@@ -188,8 +189,8 @@ def login() -> Response | str:
 
     if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
 
-        user.authenticated = True
-        db.session.commit()
+        # user.authenticated = True
+        # db.session.commit()
 
         if flask_login.login_user(user):
             return redirect(url_for('index'))
@@ -284,16 +285,16 @@ def register() -> Response | str:
 
 
 @app.route('/logout')
-@login_required
+# @login_required
 def logout() -> Response:
     """
     Logs the user out.
     :return: a redirect to the index page.
     """
 
-    user: User = current_user
-    user.authenticated = False
-    db.session.commit()
+    # user: User = current_user
+    # user.authenticated = False
+    # db.session.commit()
     flask_login.logout_user()
     return redirect(url_for('index'))
 
