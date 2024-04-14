@@ -117,6 +117,7 @@ body {
 
 .modal-header, .modal-footer {
   padding: 2px 16px;
+  padding-bottom: 2em;
   background-color: #65001c;
   color: white;
 }
@@ -472,5 +473,14 @@ body {
 .survey-link {
     text-align: center;
     margin-top: 1em;
+    color: #4ea8d8;
+}
+
+/* Main Question Formatting in Modal */
+.main-question {
+    font-size: 1.5em;
+    text-align: center;
+    margin: 0;
+    padding: 1em;
     color: #4ea8d8;
 }

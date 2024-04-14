@@ -15,7 +15,7 @@
  * @param {String} promptId the id of the prompt to submit a response for
  */
 function openModal(prompt, promptId) {
-    document.getElementById('modal-prompt').innerHTML = prompt;
+    document.getElementById('main-question').innerHTML = prompt;
     document.getElementById('prompt_id').value = promptId;
     document.getElementById('modal').style.display = 'block';
 }
@@ -30,7 +30,7 @@ function openModal(prompt, promptId) {
  * @param {String} response the response to display in the modal
  */
 function openModalWithResponse(prompt, promptId, response) {
-    document.getElementById('modal-prompt').innerHTML = prompt;
+    document.getElementById('main-question').innerHTML = prompt;
     document.getElementById('prompt_id').value = promptId;
     document.getElementById('response').value = response;
     document.getElementById('modal').style.display = 'block';
