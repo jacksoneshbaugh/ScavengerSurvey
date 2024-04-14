@@ -22,7 +22,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <span class="close" onclick="closeModal()">&times;</span>
-                    <h2 id="modal-prompt" class="modal-prompt"></h2>
+                    <h2 class="modal-prompt"> What is their name? What is their department or major?<br /><span id="main-question" class="main-question"></span></h2>
                 </div>
                 <form action="{{ url_for('bingo_board', id = id) }}" method="post">
                     <div class="modal-body">
