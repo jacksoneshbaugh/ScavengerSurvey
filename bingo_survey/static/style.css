@@ -227,7 +227,7 @@ body {
     padding: 1em;
 }
 
-@media screen and (max-width: 600px){
+@media screen and (max-width: 800px){
 
     .footer img {
         width: 30%;
@@ -324,7 +324,7 @@ body {
 
 /* Responsive Styles */
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
     .navbar a:not(:first-child) {display: none;}
     .navbar a.icon {
         float: right;
