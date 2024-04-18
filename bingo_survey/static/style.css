@@ -227,6 +227,15 @@ body {
     padding: 1em;
 }
 
+@media screen and (max-width: 600px){
+
+    .footer img {
+        width: 30%;
+        height: 30%;
+    }
+
+}
+
 .footer-spacer {
     height: 5em;
 }
@@ -405,9 +414,6 @@ body {
     }
 
     .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
         width: 100%;
         background-color: #65001c;
         color: white;
