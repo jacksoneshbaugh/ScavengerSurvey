@@ -227,15 +227,6 @@ body {
     padding: 1em;
 }
 
-@media screen and (max-width: 800px){
-
-    .footer img {
-        width: 30%;
-        height: 30%;
-    }
-
-}
-
 .footer-spacer {
     height: 5em;
 }
